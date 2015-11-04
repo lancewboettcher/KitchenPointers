@@ -1,15 +1,17 @@
 package com.kitchenpointers;
 
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@EnableAutoConfiguration
 public class HelloController {
 
     @RequestMapping("/hello")
     public String hello() {
-    	System.out.println("here");
-        return "hello.html";
+    	System.out.println("heress");
+        return "hello";
     }
 
 }
