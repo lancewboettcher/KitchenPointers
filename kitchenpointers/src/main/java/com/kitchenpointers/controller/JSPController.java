@@ -1,4 +1,4 @@
-package com.kitchenpointers;
+package com.kitchenpointers.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,7 +9,7 @@ public class JSPController {
 	
     @RequestMapping("/test")
     public String test(ModelAndView modelAndView) {
-    	System.out.println("heress");
+    	System.out.println("SUP");
         return "test";
     }
     
