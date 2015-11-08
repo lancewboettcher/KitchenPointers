@@ -6,6 +6,7 @@
 /build
 /code
 .classpath
+.class
 .project
 .settings
 .metadata
@@ -68,3 +69,6 @@ local.properties
  
 # PDT-specific
 .buildpath
+*.original
+
+*.original
