@@ -72,3 +72,10 @@ local.properties
 *.original
 
 *.original
+
+
+# Maven 
+/.mvn
+mvnw
+mvnw.cmd
+
