@@ -1,7 +1,5 @@
 package com.kitchenpointers.controller;
 
-import java.util.ArrayList;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kitchenpointers.domain.GetRecipesResponse;
 import com.kitchenpointers.domain.Recipe;
 import com.kitchenpointers.domain.SearchCriteria;
 import com.kitchenpointers.service.RecipeService;
@@ -29,11 +28,14 @@ public class RecipeController {
     }
     
     @RequestMapping(value = "/getRecipes", method = RequestMethod.POST)
-    public ArrayList<Recipe> getRecipes(@RequestBody SearchCriteria criteria) {
+    public GetRecipesResponse getRecipes(@RequestBody SearchCriteria criteria) {
     	System.out.println("Called get Recipes");
     	System.out.println(criteria.getCalories());
     	
-        return recipeService.getRecipes(criteria);
+    	GetRecipesResponse recipes = new GetRecipesResponse();
+    	recipes.setRecipes(recipeService.getRecipes(criteria));
+    	
+        return recipes;
     }
     
     @RequestMapping(value = "/addRecipe", method = RequestMethod.POST)
