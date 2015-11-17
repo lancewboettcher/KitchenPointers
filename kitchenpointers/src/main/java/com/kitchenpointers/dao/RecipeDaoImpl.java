@@ -80,11 +80,23 @@ public class RecipeDaoImpl implements RecipeDao {
 			for(int i = 0; i < recipes.size(); i++) {
 				ingredients = new ArrayList<Ingredient>();
 				
-				pst = conn.prepareStatement("SELECT * FROM recipeIngredients WHERE recipeID=" + recipes.get(i).getId());
+				String query = "SELECT r.recipeID, r.ingredientID, r.quantity, n.Shrt_Desc "
+						+ "FROM recipeIngredients r "
+						+ "JOIN nutritionFacts n "
+						+ "ON r.ingredientID=n.NDB_No "
+						+ "WHERE recipeID=" + recipes.get(i).getId();
+				
+				System.out.println("Get ings q: \n" + query);
+				
+				pst = conn.prepareStatement(query);
 				rst = pst.executeQuery();
 				
 				while (rst.next()) {
-					ingredients.add(new Ingredient(rst.getInt("ingredientID"), null, 0.0, rst.getString("quantity")));
+					ingredients.add(new Ingredient(	rst.getInt("ingredientID"), 
+													rst.getString("Shrt_Desc"), 
+													0.0, 
+													rst.getString("quantity"))
+								   );
 				}
 				
 				recipes.get(i).setIngredients(ingredients);
@@ -115,10 +127,12 @@ public class RecipeDaoImpl implements RecipeDao {
 		return recipes;
 	}
 	
-	public void addRecipe() {
+	@Override
+	public void addRecipe(Recipe recipe) {
 		MakeSQL makeSQL = new MakeSQL();
 		
-		int[] ingredients = { 05746, 04053, 11215, 19334 };
+		
+		int[] ingredients = {05746, 04053, 11215, 19334 };
 		String[] quantities = { "4", "4", "4", "1" };
 		String URL = "http://www.food.com/recipe/easy-garlic-chicken-5478";
 		String cuisine = "Asian";

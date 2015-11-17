@@ -8,5 +8,7 @@ import com.kitchenpointers.domain.SearchCriteria;
 public interface RecipeDao {
 
 	public ArrayList<Recipe> getRecipes(SearchCriteria criteria);
+
+	void addRecipe(Recipe recipe);
 	
 }
