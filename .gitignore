@@ -5,9 +5,7 @@
 *~
 /build
 /code
-.classpath
 .class
-.project
 .settings
 .metadata
 .factorypath
