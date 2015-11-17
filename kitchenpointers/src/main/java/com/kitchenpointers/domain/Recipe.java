@@ -14,6 +14,25 @@ public class Recipe {
 	private String url;
 	ArrayList<Ingredient> ingredients;
 	
+	public Recipe() {
+		
+	}
+	
+	public Recipe(int id, String name, int calories, int fat, int sugar, int protein, String cuisine, int rating,
+			String url, ArrayList<Ingredient> ingredients) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.calories = calories;
+		this.fat = fat;
+		this.sugar = sugar;
+		this.protein = protein;
+		this.cuisine = cuisine;
+		this.rating = rating;
+		this.url = url;
+		this.ingredients = ingredients;
+	}
+	
 	public int getId() {
 		return id;
 	}

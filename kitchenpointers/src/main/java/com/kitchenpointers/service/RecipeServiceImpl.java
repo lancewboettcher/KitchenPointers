@@ -2,9 +2,12 @@ package com.kitchenpointers.service;
 
 import java.util.ArrayList;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.stereotype.Service;
 
-import com.kitchenpointers.dao.JDBCConnect;
+import com.kitchenpointers.dao.RecipeDao;
+import com.kitchenpointers.dao.RecipeDaoImpl;
 import com.kitchenpointers.domain.Ingredient;
 import com.kitchenpointers.domain.Recipe;
 import com.kitchenpointers.domain.SearchCriteria;
@@ -122,10 +125,9 @@ public class RecipeServiceImpl implements RecipeService {
 		
 		recipes.add(recipe2);
 		
-		JDBCConnect connect = new JDBCConnect();
-		
-		//return recipes;
-		return recipes;
+		RecipeDao recipeDao = new RecipeDaoImpl();
+						
+		return recipeDao.getRecipes(criteria);
 	}
 	
 	@Override

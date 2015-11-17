@@ -2,10 +2,22 @@ package com.kitchenpointers.domain;
 
 public class Ingredient {
 	private int ingredientId;
+	private String name;
 	private double quantity;
 	private String unit;
-	private String name;
 	
+	public Ingredient() {
+		
+	}
+	
+	public Ingredient(int ingredientId, String name, double quantity, String unit) {
+		super();
+		this.ingredientId = ingredientId;
+		this.name = name;
+		this.quantity = quantity;
+		this.unit = unit;
+	}
+
 	public int getIngredientId() {
 		return ingredientId;
 	}
