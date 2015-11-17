@@ -5,11 +5,7 @@ class RecipeIngredientsTuple {
 	private String ingredientID;
 	private String quantity;
 
-	public RecipeIngredientsTuple() {
-		this.recipeID = null;
-		this.ingredientID = null;
-		this.quantity = null;
-	}
+	public RecipeIngredientsTuple() {}
 	public RecipeIngredientsTuple(int recipeID, String ingredientID, String quantity) {
 		this.recipeID = recipeID;
 		this.ingredientID = ingredientID;
@@ -36,3 +32,4 @@ class RecipeIngredientsTuple {
 		this.quantity = quantity;
 	}
 }
+
