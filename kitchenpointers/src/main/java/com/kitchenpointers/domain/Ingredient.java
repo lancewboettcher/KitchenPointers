@@ -2,7 +2,7 @@ package com.kitchenpointers.domain;
 
 public class Ingredient {
 	private int ingredientId;
-	private float quantity;
+	private double quantity;
 	private String unit;
 	private String name;
 	
@@ -12,10 +12,10 @@ public class Ingredient {
 	public void setIngredientId(int ingredientId) {
 		this.ingredientId = ingredientId;
 	}
-	public float getQuantity() {
+	public double getQuantity() {
 		return quantity;
 	}
-	public void setQuantity(float quantity) {
+	public void setQuantity(double quantity) {
 		this.quantity = quantity;
 	}
 	public String getUnit() {

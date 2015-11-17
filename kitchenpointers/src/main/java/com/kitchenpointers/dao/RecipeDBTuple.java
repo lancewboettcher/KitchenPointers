@@ -9,7 +9,7 @@ class RecipeDBTuple {
 	private double sugarCount;
 	private double proteinCount;
 	private String URL;
-
+/*
 	public RecipeDBTuple() {
 		this.recipeID = null;
 		this.recipeName = null;
@@ -19,7 +19,7 @@ class RecipeDBTuple {
 		this.sugarCount = null;
 		this.proteinCount = null;
 		this.URL = null;
-	}
+	}*/
 	public RecipeDBTuple(int recipeID, String recipeName, String cuisine, double calorieCount, double fatCount, double sugarCount, double proteinCount, String URL) {
 		this.recipeID = recipeID;
 		this.recipeName = recipeName;
