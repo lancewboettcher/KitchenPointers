@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.springframework.stereotype.Service;
 
+import com.kitchenpointers.dao.JDBCConnect;
 import com.kitchenpointers.domain.Ingredient;
 import com.kitchenpointers.domain.Recipe;
 import com.kitchenpointers.domain.SearchCriteria;
@@ -120,6 +121,8 @@ public class RecipeServiceImpl implements RecipeService {
 		recipe2.setUrl("http://allrecipes.com/recipe/42881/beer-battered-chicken/?internalSource=recipe%20hub&referringId=1284&referringContentType=recipe%20hub");
 		
 		recipes.add(recipe2);
+		
+		JDBCConnect connect = new JDBCConnect();
 		
 		//return recipes;
 		return recipes;

@@ -29,7 +29,7 @@ public class RecipeController {
     
     @RequestMapping(value = "/getRecipes", method = RequestMethod.POST)
     public GetRecipesResponse getRecipes(@RequestBody SearchCriteria criteria) {
-    	System.out.println("Called get Recipes");
+    	System.out.println("Called get Recipes!");
     	System.out.println(criteria.getCalories());
     	
     	GetRecipesResponse recipes = new GetRecipesResponse();
