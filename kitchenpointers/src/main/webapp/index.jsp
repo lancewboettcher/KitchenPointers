@@ -130,9 +130,8 @@ $(document).ready(function(){
 				"sortBy" : $('#sortBy option:selected').text()
 			}
   	     
-		 /*  You're going to need to change url to kitchenpointers/recipes if you want to run locally */
   	     $.ajax({
-  	       url: "/demo/getRecipes",
+  	       url: "/kitchenpointers/getRecipes",
   	       type: 'POST',
   	       contentType:'application/json',
   	       data: JSON.stringify(ingredientList),
@@ -140,12 +139,6 @@ $(document).ready(function(){
   	       success: function(response){
   	    	    createRecipeTable(response.recipes);
   	    	    
-  	    	    //console.log(response.recipes[0].name);
-  	    	    /* throws error
-  	    	    var posts = JSON.parse(response);
-  	    	    $.each(posts, function() {
-  	    	    	console.log(this);
-  	    	    });*/
   	          },
   	       error: function(xhr, ajaxOptions, thrownError) {
   	          	//On error do this
@@ -244,7 +237,7 @@ $(document).ready(function(){
 		<tbody>
 		
 		</tbody>
-	</div>
+	</table>
 </div>
 </body>
 </html>
