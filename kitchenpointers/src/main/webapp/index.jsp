@@ -36,6 +36,10 @@ margin: 0 auto;
 
 }
 
+#recipeTable {
+	visibility: hidden;
+}
+
 </style>
 
 </head>
@@ -134,8 +138,14 @@ $(document).ready(function(){
   	       data: JSON.stringify(ingredientList),
   	       dataType:'json',
   	       success: function(response){
-	  	    	//do something with response here 
-  	    	    alert(response);
+  	    	    createRecipeTable(response.recipes);
+  	    	    
+  	    	    //console.log(response.recipes[0].name);
+  	    	    /* throws error
+  	    	    var posts = JSON.parse(response);
+  	    	    $.each(posts, function() {
+  	    	    	console.log(this);
+  	    	    });*/
   	          },
   	       error: function(xhr, ajaxOptions, thrownError) {
   	          	//On error do this
@@ -150,10 +160,28 @@ $(document).ready(function(){
   	            }
   	        }
   	     });
-     
+     	
+		$("#recipeTable").css('visibility', 'visible');
      });
      
-     
+     function createRecipeTable(recipeList) {
+    	 for(var i = 0; i < recipeList.length; i++) {    		 	
+    		 var link = document.createElement('a');
+    		 link.setAttribute('href', recipeList[i].url);
+    		 link.innerHTML = "[link to recipe]";
+    			 
+    		 var row = $("<tr>");
+
+    		  row.append($("<td>" + recipeList[i].name + "</td>"))
+    		     .append($("<td>" + recipeList[i].calories + "</td>"))
+    		     .append($("<td>")
+    		     	.append(link)
+    		     	.append($("</td>")));
+    		 
+    		  $("#recipeTable tbody").append(row);
+    	 }
+    	 
+     }
   });
 </script>
 </head>
@@ -202,6 +230,21 @@ $(document).ready(function(){
 	<br><br>
 	
 	<input type='button' value='Get Recipe' id='getButtonValue'>
+	
+	<br><br>
+	
+	<table id="recipeTable" class="table table-striped table-bordered">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Calories</th>
+				<th>Link</th>
+			</tr>
+		</thead>
+		<tbody>
+		
+		</tbody>
+	</div>
 </div>
 </body>
 </html>
