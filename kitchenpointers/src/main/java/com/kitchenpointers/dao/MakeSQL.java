@@ -70,6 +70,18 @@ public class MakeSQL{
  //     System.out.println(this.out);
       return this.out;
    }
+      //query to return all the nouns in a line of a recipe
+   public String getKeywords(){
+      this.out = "SELECT word FROM moby_thesaurus.word_parts_of_speech where ";
+      String[] tokens = this.in.split(" ");
+      for(int i=0; i<tokens.length; i++){
+         this.out = this.out +"word = '" + tokens[i]+ "' AND part_of_speech_id = 1 OR ";        
+      }
+      this.out = this.out.substring(0, this.out.lastIndexOf("OR ")) + ";";
+  //    System.out.println(this.out);
+      return this.out;
+
+   }
    /*
    public static void main(String[] args){
       //Scanner sc = new Scanner(System.in);
