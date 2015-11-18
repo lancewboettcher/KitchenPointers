@@ -2,13 +2,10 @@ package com.kitchenpointers.service;
 
 import java.util.ArrayList;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.stereotype.Service;
 
 import com.kitchenpointers.dao.RecipeDao;
 import com.kitchenpointers.dao.RecipeDaoImpl;
-import com.kitchenpointers.domain.Ingredient;
 import com.kitchenpointers.domain.Recipe;
 import com.kitchenpointers.domain.SearchCriteria;
 
@@ -20,10 +17,22 @@ public class RecipeServiceImpl implements RecipeService {
 	}
 	
 	@Override
-	public ArrayList<Recipe> getRecipes(SearchCriteria criteria) {
-		ArrayList<Recipe> recipes = new ArrayList<Recipe>();
+	public ArrayList<Recipe> getRecipes(SearchCriteria criteria) {			
+		RecipeDao recipeDao = new RecipeDaoImpl();
+						
+		return recipeDao.getRecipes(criteria);
+	}
+	
+	@Override
+	public void addRecipe(Recipe recipe) {
+		RecipeDao recipeDao = new RecipeDaoImpl();
 		
-		ArrayList<Ingredient> ingredients = new ArrayList<Ingredient>();
+		recipeDao.addRecipe(recipe);
+	}
+}
+
+/* 
+ ArrayList<Ingredient> ingredients = new ArrayList<Ingredient>();
 		
 		Ingredient ing1 = new Ingredient();
 		ing1.setIngredientId(357);
@@ -124,14 +133,4 @@ public class RecipeServiceImpl implements RecipeService {
 		recipe2.setUrl("http://allrecipes.com/recipe/42881/beer-battered-chicken/?internalSource=recipe%20hub&referringId=1284&referringContentType=recipe%20hub");
 		
 		recipes.add(recipe2);
-		
-		RecipeDao recipeDao = new RecipeDaoImpl();
-						
-		return recipeDao.getRecipes(criteria);
-	}
-	
-	@Override
-	public void addRecipe(Recipe recipe) {
-		
-	}
-}
+*/

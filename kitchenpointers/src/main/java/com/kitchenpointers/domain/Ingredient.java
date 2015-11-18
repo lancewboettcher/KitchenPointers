@@ -7,7 +7,10 @@ public class Ingredient {
 	private String unit;
 	
 	public Ingredient() {
-		
+		this.ingredientId = 0;
+		this.name = "";
+		this.quantity = 0.0;
+		this.unit = "";
 	}
 	
 	public Ingredient(int ingredientId, String name, double quantity, String unit) {

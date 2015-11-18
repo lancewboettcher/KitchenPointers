@@ -39,10 +39,12 @@ public class RecipeController {
     }
     
     @RequestMapping(value = "/addRecipe", method = RequestMethod.POST)
-    public void addRecipe(@RequestBody Recipe recipe) {
+    public Recipe addRecipe(@RequestBody Recipe recipe) {
     	System.out.println("Called add recipe");
     	
         recipeService.addRecipe(recipe);
+        
+        return recipe;
     }
 
 }

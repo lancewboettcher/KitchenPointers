@@ -112,13 +112,16 @@ public class RecipeDaoImpl implements RecipeDao {
 	@Override
 	public ArrayList<Recipe> getRecipes(SearchCriteria criteria) {
 		Connection conn = getConnection();
-
-		String foods = "Chicken skinless boneless breast";
 		
-		ArrayList<Integer> ingredientIDs = new ArrayList<Integer>();
-		ingredientIDs.add(getIngredientID(conn, foods));
+		String includedIngredientIDs = "";
 		
-		System.out.println("Ingredient IDs Found: " + ingredientIDs);
+		for (String ingredient : criteria.getIncludedIngredients()) {
+			includedIngredientIDs += Integer.toString(getIngredientID(conn, ingredient)) + " ";
+		}
+		
+		includedIngredientIDs.trim();
+		
+		System.out.println("Ingredient IDs Found: " + includedIngredientIDs);
 		
 		String ingredientIDString = "01152";
 				
@@ -129,16 +132,40 @@ public class RecipeDaoImpl implements RecipeDao {
 	
 	@Override
 	public void addRecipe(Recipe recipe) {
+		Connection conn = getConnection();
+		PreparedStatement pst;
+		
 		MakeSQL makeSQL = new MakeSQL();
 		
+		ArrayList<Integer> ingredientIDs = new ArrayList<Integer>();
+		ArrayList<String> quantities = new ArrayList<String>();
 		
-		int[] ingredients = {05746, 04053, 11215, 19334 };
-		String[] quantities = { "4", "4", "4", "1" };
-		String URL = "http://www.food.com/recipe/easy-garlic-chicken-5478";
-		String cuisine = "Asian";
-		String name = "Garlic Chicken";
-		makeSQL.makeAddRecipe(2, ingredients, quantities, name, cuisine, URL);
+		for (Ingredient ingredient : recipe.getIngredients()) {
+			ingredientIDs.add(getIngredientID(conn, ingredient.getName()));
+			quantities.add(Double.toString(ingredient.getQuantity()));
+		}
 		
+		System.out.println("Ingredient IDs Found: \n" + ingredientIDs);
+
+		String makeQuery = makeSQL.makeAddRecipe(recipe.getId(), ingredientIDs, quantities, 
+				recipe.getName(), recipe.getCuisine(), recipe.getUrl());
+		
+		System.out.println("Make Query: \n" + makeQuery);
+		
+		try {
+			pst = conn.prepareStatement("INSERT into recipeDB values(6, 'COPY Oatmeal M&M cookies COPY', "
+					+ "'American', NULL, NULL, NULL, NULL, "
+					+ "'http://www.cookbooks.com/cookbooks_recipes/Recipe-Details.asp?id=753018');");
+			pst.executeUpdate();
+			
+			pst = conn.prepareStatement(makeQuery);
+			pst.executeUpdate();
+			
+			System.out.println("Recipe Added To Database");
+			
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 }

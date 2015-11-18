@@ -15,7 +15,16 @@ public class Recipe {
 	ArrayList<Ingredient> ingredients;
 	
 	public Recipe() {
-		
+		this.id = 0;
+		this.name = "";
+		this.calories = 0;
+		this.fat = 0;
+		this.sugar = 0;
+		this.protein = 0;
+		this.cuisine = "";
+		this.rating = 0;
+		this.url = "";
+		ingredients = new ArrayList<Ingredient>();
 	}
 	
 	public Recipe(int id, String name, int calories, int fat, int sugar, int protein, String cuisine, int rating,
