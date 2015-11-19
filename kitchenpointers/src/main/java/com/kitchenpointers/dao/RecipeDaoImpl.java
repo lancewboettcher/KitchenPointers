@@ -53,6 +53,39 @@ public class RecipeDaoImpl implements RecipeDao {
 		return ingredientID;
 	}
 	
+	private String getIngredientIDString(Connection conn, String ingredient) {
+		ResultSet rst;
+		PreparedStatement pst;
+		
+		if (ingredient.contains("'")) {
+			ingredient = ingredient.replace("'", "\\'");
+		}
+		System.out.println(ingredient);
+		
+		MakeSQL makeSQL = new MakeSQL(ingredient);
+		String NDBQuery = makeSQL.makeNDBQuery();
+		
+		String ingredientID = "";
+		
+		System.out.println("NDB QUERY: \n" + NDBQuery);
+
+		try {
+			pst = conn.prepareStatement(NDBQuery);
+			rst = pst.executeQuery();
+			
+			if (rst.next()) {
+				ingredientID = rst.getString("NDB_No");
+			}
+			else {
+				System.out.println("Ingredient Not Found");
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return ingredientID;
+	}
+	
 	private ArrayList<Recipe> executeRecipeQuery(Connection conn, String ingredientIDs) {
 		ResultSet rst;
 		PreparedStatement pst;
@@ -135,33 +168,92 @@ public class RecipeDaoImpl implements RecipeDao {
 		Connection conn = getConnection();
 		PreparedStatement pst;
 		
-		MakeSQL makeSQL = new MakeSQL();
-		
-		ArrayList<Integer> ingredientIDs = new ArrayList<Integer>();
-		ArrayList<String> quantities = new ArrayList<String>();
-		
-		for (Ingredient ingredient : recipe.getIngredients()) {
-			ingredientIDs.add(getIngredientID(conn, ingredient.getName()));
-			quantities.add(Double.toString(ingredient.getQuantity()));
-		}
-		
-		System.out.println("Ingredient IDs Found: \n" + ingredientIDs);
+		try {
+			//Create the Recipe
+			pst = conn.prepareStatement("INSERT into recipeDB values(?, ?, ?, NULL, NULL, NULL, NULL,?);");
+			pst.setInt(1, recipe.getId());
+			pst.setString(2, recipe.getName());
+			pst.setString(3, recipe.getCuisine());
+			pst.setString(4, recipe.getUrl());
+			
+			pst.executeUpdate();
+			
+			//Add all ingredients
+			for (Ingredient ingredient : recipe.getIngredients()) {
+				pst = conn.prepareStatement("INSERT into recipeIngredients values(?,?,?);");
+				pst.setInt(1, recipe.getId());
+				pst.setString(2,getIngredientIDString(conn, ingredient.getName()));
+				pst.setString(3, Double.toString(ingredient.getQuantity()));
+				
+				pst.executeUpdate();
+			}
+			
+			//Update the nutrition facts 
+			pst = conn.prepareStatement("UPDATE recipeDB SET proteinCount= (SELECT SUM(P.Protein) "
+					+ "FROM (SELECT t2.Protein FROM recipeIngredients as t1 Join nutritionFacts as t2 "
+					+ "ON t1.ingredientID= t2.NDB_No WHERE t1.recipeID=?) as P) "
+					+ "WHERE recipeID=?;");
+			pst.setInt(1, recipe.getId());
+			pst.setInt(2, recipe.getId());
+			
+			pst.executeUpdate();
+			
+			pst = conn.prepareStatement("UPDATE recipeDB set calorieCount = (SELECT SUM(P.Energ_Kcal) "
+					+ "FROM (SELECT t2.Energ_Kcal from recipeIngredients as t1 "
+					+ "JOIN nutritionFacts as t2 on t1.ingredientID= t2.NDB_No "
+					+ "WHERE t1.recipeID=?) as P) "
+					+ "WHERE recipeID =?;");
+			pst.setInt(1, recipe.getId());
+			pst.setInt(2, recipe.getId());
+			
+			pst.executeUpdate();
 
-		String makeQuery = makeSQL.makeAddRecipe(recipe.getId(), ingredientIDs, quantities, 
-				recipe.getName(), recipe.getCuisine(), recipe.getUrl());
-		
-		System.out.println("Make Query: \n" + makeQuery);
+			pst = conn.prepareStatement("UPDATE recipeDB set fatCount = (SELECT SUM(P.Lipid_tot) "
+					+ "FROM (SELECT t2.Lipid_tot from recipeIngredients as t1 "
+					+ "JOIN nutritionFacts as t2 on t1.ingredientID= t2.NDB_No "
+					+ "WHERE t1.recipeID=?) as P) "
+					+ "WHERE recipeID =?;");
+			pst.setInt(1, recipe.getId());
+			pst.setInt(2, recipe.getId());
+			
+			pst.executeUpdate();
+			
+			pst = conn.prepareStatement("UPDATE recipeDB set sugarCount = (SELECT SUM(P.Sugar_tot) "
+					+ "FROM (SELECT t2.Sugar_tot from recipeIngredients as t1 "
+					+ "JOIN nutritionFacts as t2 on t1.ingredientID= t2.NDB_No "
+					+ "WHERE t1.recipeID=?) as P) "
+					+ "WHERE recipeID =?;");
+			pst.setInt(1, recipe.getId());
+			pst.setInt(2, recipe.getId());			
+			
+			pst.executeUpdate();
+
+			System.out.println("Recipe Added To Database");
+			
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	@Override
+	public void deleteRecipe(int recipeId) {		
+		Connection conn = getConnection();
+		PreparedStatement pst;
 		
 		try {
-			pst = conn.prepareStatement("INSERT into recipeDB values(6, 'COPY Oatmeal M&M cookies COPY', "
-					+ "'American', NULL, NULL, NULL, NULL, "
-					+ "'http://www.cookbooks.com/cookbooks_recipes/Recipe-Details.asp?id=753018');");
+			//Delete the ingredients
+			pst = conn.prepareStatement("DELETE FROM recipeIngredients WHERE recipeID = ?;");
+			pst.setInt(1, recipeId);
+
 			pst.executeUpdate();
 			
-			pst = conn.prepareStatement(makeQuery);
+			//Delete the Recipe
+			pst = conn.prepareStatement("DELETE FROM recipeDB WHERE recipeID = ?;");
+			pst.setInt(1, recipeId);
+
 			pst.executeUpdate();
-			
-			System.out.println("Recipe Added To Database");
+
+			System.out.println("Recipe Deleted From Database");
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();

@@ -49,17 +49,18 @@ public class MakeSQL{
    public String getNextRID(){
       return "SELECT max(recipeID) from recipeDB ;";
    }
+      
    //Make the query to insert a new recipe into the database. 
    //call getNextRID first so you know what rID should be.
-   public String makeAddRecipe(int rID, ArrayList<Integer> ingredient, ArrayList<String> quantity, String name, String cuisine, String URL){
-  //    this.out = "INSERT into recipeDB values(" + String.valueOf(rID) + ", '" + name +"', '" +cuisine +"', NULL, NULL, NULL, NULL, '" + URL + "'); \n";
-    this.out = "";
+   public String makeAddRecipe(int rID, ArrayList<String> ingredient, ArrayList<String> quantity, String name, String cuisine, String URL){
+	//  this.out = "INSERT into recipeDB values(" + String.valueOf(rID) + ", '" + name +"', '" +cuisine +"', NULL, NULL, NULL, NULL, '" + URL + "'); \n";
+	  
+this.out = "";	   
 	   String sql1;
       for(int i = 0; i<ingredient.size(); i++){
          sql1 = "INSERT into recipeIngredients values('";
-         this.out = this.out + sql1 + String.valueOf(rID) + "',"
- 		 + "(select NDB_No from nutritionFacts where NDB_No="       		 
-         + String.valueOf(ingredient.get(i)) + "),'"
+         this.out = this.out + sql1 + String.valueOf(rID) + "','"
+         + String.valueOf(ingredient.get(i)) + "','"
          + quantity.get(i) + "');\n";
       }
       String updateProtein = 
@@ -70,7 +71,7 @@ public class MakeSQL{
    "UPDATE recipeDB set fatCount = (SELECT SUM(P.Lipid_tot) FROM (SELECT t2.Lipid_tot from recipeIngredients as t1 JOIN nutritionFacts as t2 on t1.ingredientID= t2.NDB_No WHERE t1.recipeID=" + String.valueOf(rID)+") as P) WHERE recipeID =" + String.valueOf(rID)+ ";\n";
       String updateSugar = 
    "UPDATE recipeDB set sugarCount = (SELECT SUM(P.Sugar_tot) FROM (SELECT t2.Sugar_tot from recipeIngredients as t1 JOIN nutritionFacts as t2 on t1.ingredientID= t2.NDB_No WHERE t1.recipeID=" + String.valueOf(rID)+") as P) WHERE recipeID =" + String.valueOf(rID)+ ";\n";
-      this.out = this.out + updateProtein + updateCalorie + updateFat + updateSugar;
+//      this.out = this.out + updateProtein + updateCalorie + updateFat + updateSugar;
  //     System.out.println(this.out);
       return this.out;
    }

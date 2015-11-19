@@ -46,5 +46,14 @@ public class RecipeController {
         
         return recipe;
     }
+    
+    @RequestMapping(value = "/deleteRecipe", method = RequestMethod.POST)
+    public int addRecipe(@RequestBody Integer recipeId) {
+    	System.out.println("Called delete recipeId: " + recipeId);
+    	
+        recipeService.deleteRecipe(recipeId);
+        
+        return recipeId;
+    }
 
 }

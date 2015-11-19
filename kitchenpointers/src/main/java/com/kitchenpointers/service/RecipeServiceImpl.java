@@ -29,6 +29,13 @@ public class RecipeServiceImpl implements RecipeService {
 		
 		recipeDao.addRecipe(recipe);
 	}
+	
+	@Override
+	public void deleteRecipe(int recipeId) {
+		RecipeDao recipeDao = new RecipeDaoImpl();
+		
+		recipeDao.deleteRecipe(recipeId);
+	}
 }
 
 /* 
