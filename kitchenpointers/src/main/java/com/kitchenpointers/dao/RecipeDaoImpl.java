@@ -156,9 +156,9 @@ public class RecipeDaoImpl implements RecipeDao {
 		
 		System.out.println("Ingredient IDs Found: " + includedIngredientIDs);
 		
-		String ingredientIDString = "01152";
+	//	String ingredientIDString = "01152";
 				
-		ArrayList<Recipe> recipes = executeRecipeQuery(conn, ingredientIDString);
+		ArrayList<Recipe> recipes = executeRecipeQuery(conn, includedIngredientIDs);
 
 		return recipes;
 	}
@@ -231,6 +231,8 @@ public class RecipeDaoImpl implements RecipeDao {
 			System.out.println("Recipe Added To Database");
 			
 		} catch (Exception ex) {
+			deleteRecipe(recipe.getId());
+			
 			ex.printStackTrace();
 		}
 	}

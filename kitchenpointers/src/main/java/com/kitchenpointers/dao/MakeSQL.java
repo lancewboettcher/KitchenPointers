@@ -71,7 +71,7 @@ this.out = "";
    "UPDATE recipeDB set fatCount = (SELECT SUM(P.Lipid_tot) FROM (SELECT t2.Lipid_tot from recipeIngredients as t1 JOIN nutritionFacts as t2 on t1.ingredientID= t2.NDB_No WHERE t1.recipeID=" + String.valueOf(rID)+") as P) WHERE recipeID =" + String.valueOf(rID)+ ";\n";
       String updateSugar = 
    "UPDATE recipeDB set sugarCount = (SELECT SUM(P.Sugar_tot) FROM (SELECT t2.Sugar_tot from recipeIngredients as t1 JOIN nutritionFacts as t2 on t1.ingredientID= t2.NDB_No WHERE t1.recipeID=" + String.valueOf(rID)+") as P) WHERE recipeID =" + String.valueOf(rID)+ ";\n";
-//      this.out = this.out + updateProtein + updateCalorie + updateFat + updateSugar;
+      this.out = this.out + updateProtein + updateCalorie + updateFat + updateSugar;
  //     System.out.println(this.out);
       return this.out;
    }
