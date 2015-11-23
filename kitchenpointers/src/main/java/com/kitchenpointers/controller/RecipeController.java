@@ -16,43 +16,43 @@ import com.kitchenpointers.service.RecipeService;
 @RestController
 @EnableAutoConfiguration
 public class RecipeController {
-	
-	@Autowired
-	private RecipeService recipeService;
+
+    @Autowired
+    private RecipeService recipeService;
 
     @RequestMapping(value = "/hello", method = RequestMethod.GET)
     @ResponseBody
     public String hello() {
-    	System.out.println("SUP");
+        System.out.println("SUP");
         return "hellosasd";
     }
-    
+
     @RequestMapping(value = "/getRecipes", method = RequestMethod.POST)
     public GetRecipesResponse getRecipes(@RequestBody SearchCriteria criteria) {
-    	System.out.println("Called get Recipes!");
-    	System.out.println(criteria.getCalories());
-    	
-    	GetRecipesResponse recipes = new GetRecipesResponse();
-    	recipes.setRecipes(recipeService.getRecipes(criteria));
-    	
+        System.out.println("Called get Recipes!");
+        System.out.println(criteria.getCalories());
+
+        GetRecipesResponse recipes = new GetRecipesResponse();
+        recipes.setRecipes(recipeService.getRecipes(criteria));
+
         return recipes;
     }
-    
+
     @RequestMapping(value = "/addRecipe", method = RequestMethod.POST)
     public Recipe addRecipe(@RequestBody Recipe recipe) {
-    	System.out.println("Called add recipe");
-    	
+        System.out.println("Called add recipe");
+
         recipeService.addRecipe(recipe);
-        
+
         return recipe;
     }
-    
+
     @RequestMapping(value = "/deleteRecipe", method = RequestMethod.POST)
     public int addRecipe(@RequestBody Integer recipeId) {
-    	System.out.println("Called delete recipeId: " + recipeId);
-    	
+        System.out.println("Called delete recipeId: " + recipeId);
+
         recipeService.deleteRecipe(recipeId);
-        
+
         return recipeId;
     }
 
