@@ -24,7 +24,7 @@ public class RecipeDaoImpl implements RecipeDao {
 
 		return conn;
 	}
-
+	
 	private int getIngredientID(Connection conn, String ingredient) {
 		ResultSet rst;
 		PreparedStatement pst;
@@ -35,7 +35,7 @@ public class RecipeDaoImpl implements RecipeDao {
 		int ingredientID = 0;
 		
 		System.out.println("NDB QUERY: \n" + NDBQuery);
-
+		
 		try {
 			pst = conn.prepareStatement(NDBQuery);
 			rst = pst.executeQuery();
@@ -167,8 +167,17 @@ public class RecipeDaoImpl implements RecipeDao {
 	public void addRecipe(Recipe recipe) {
 		Connection conn = getConnection();
 		PreparedStatement pst;
+		ResultSet rst;
 		
 		try {
+			//Get the next recipeID
+			pst = conn.prepareStatement("SELECT MAX(recipeID) FROM recipeDB;");
+			rst = pst.executeQuery();
+			
+			if (rst.next()) {
+				recipe.setId(rst.getInt("max(recipeID)") + 1);
+			}
+							
 			//Create the Recipe
 			pst = conn.prepareStatement("INSERT into recipeDB values(?, ?, ?, NULL, NULL, NULL, NULL,?);");
 			pst.setInt(1, recipe.getId());

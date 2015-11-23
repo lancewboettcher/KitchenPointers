@@ -37,7 +37,7 @@ public class RecipeController {
     	
         return recipes;
     }
-    
+    //s
     @RequestMapping(value = "/addRecipe", method = RequestMethod.POST)
     public Recipe addRecipe(@RequestBody Recipe recipe) {
     	System.out.println("Called add recipe");
@@ -49,7 +49,7 @@ public class RecipeController {
     
     @RequestMapping(value = "/deleteRecipe", method = RequestMethod.POST)
     public int addRecipe(@RequestBody Integer recipeId) {
-    	System.out.println("Called delete recipeId: " + recipeId);
+    	System.out.println("Called delete with recipeId: " + recipeId);
     	
         recipeService.deleteRecipe(recipeId);
         

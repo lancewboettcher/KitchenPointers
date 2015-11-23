@@ -138,7 +138,8 @@ $(document).ready(function(){
   	       dataType:'json',
   	       success: function(response){
   	    	    createRecipeTable(response.recipes);
-  	    	    
+  	    	    console.log(ingredientList);
+  	    	    console.log(response);
   	          },
   	       error: function(xhr, ajaxOptions, thrownError) {
   	          	//On error do this
