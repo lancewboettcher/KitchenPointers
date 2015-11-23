@@ -56,6 +56,46 @@ public class RecipeDaoImpl implements RecipeDao {
 
         return ingredientID;
     }
+    
+    //Returns all possible ingredient ids in our recipeIngredients table  containing string
+    private ArrayList<String> getIngredientIds(Connection conn, String ingredient) {
+    	ArrayList<String> ingredientIds = new ArrayList<String>();
+    	ResultSet rst;
+        PreparedStatement pst;
+
+        if (ingredient.contains("'")) {
+            ingredient = ingredient.replace("'", "\\'");
+        }
+        
+        String[] ingredientWords = ingredient.split(" ");
+        
+        String query = "SELECT DISTINCT ingredientID FROM recipeIngredients r "
+        		+ "JOIN nutritionFacts n ON r.ingredientID=n.NDB_No "
+        		+ "WHERE n.Shrt_Desc LIKE '%" + ingredientWords[0] + "%'";
+        
+        for (int i = 1; i < ingredientWords.length; i++) {
+        	query = query + " AND n.Shrt_Desc LIKE '%" + ingredientWords[i] + "%'";
+        }
+        
+        query = query + ";";
+        
+        System.out.println("Get ingredientIDs query: \n" + query);
+
+        try {
+            pst = conn.prepareStatement(query);
+            rst = pst.executeQuery();
+
+            while (rst.next()) {
+                ingredientIds.add(rst.getString("ingredientID"));
+            } 
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        
+        System.out.println("Ingredient IDs found: \n" + ingredientIds);
+    	
+    	return ingredientIds;
+    }
 
     @Override
     public void addRecipe(Recipe recipe) {
@@ -152,11 +192,18 @@ public class RecipeDaoImpl implements RecipeDao {
         }
     }
 
-    private ArrayList<Recipe> executeRecipeQuery(Connection conn, ArrayList<String> ingredientIDs) {
+    private ArrayList<Recipe> getRecipeIds(Connection conn, ArrayList<ArrayList<String>> ingredientIDs) {
         ResultSet rst;
         PreparedStatement pst;
 
-        String recipeQuery = MakeSQL.getRecipeDBQuery(ingredientIDs);
+        //TODO: Change this
+        ArrayList<String> singleArrayIds = new ArrayList<String>();
+        for (ArrayList<String> ids : ingredientIDs) {
+        	for (String id : ids)
+        		singleArrayIds.add(id);
+        }
+        
+        String recipeQuery = MakeSQL.getRecipeDBQuery(singleArrayIds);
         System.out.println("RECIPE QUERY: \n" + recipeQuery);
 
         HashMap<Integer, Recipe> recipes = new HashMap<Integer, Recipe>();
@@ -187,9 +234,9 @@ public class RecipeDaoImpl implements RecipeDao {
             for (Recipe recipe : recipes.values()) {
                 ingredients = new ArrayList<Ingredient>();
 
-                String query = "SELECT r.recipeID, r.ingredientID, r.quantity, n.Shrt_Desc "
+                String query = "SELECT r.recipeID, r.ingredientID, r.quantityNum, r.quantityUnit, n.Shrt_Desc "
                         + "FROM recipeIngredients r " + "JOIN nutritionFacts n " + "ON r.ingredientID=n.NDB_No "
-                        + "WHERE recipeID =" + recipe.getId();
+                        + "WHERE recipeID =" + recipe.getId() + ";";
 
                 System.out.println("Get ings q: \n" + query);
 
@@ -197,8 +244,8 @@ public class RecipeDaoImpl implements RecipeDao {
                 rst = pst.executeQuery();
 
                 while (rst.next()) {
-                    ingredients.add(new Ingredient(rst.getInt("ingredientID"), rst.getString("Shrt_Desc"), 0.0,
-                            rst.getString("quantity")));
+                    ingredients.add(new Ingredient(rst.getInt("ingredientID"), rst.getString("Shrt_Desc"), rst.getDouble("quantityNum"),
+                            rst.getString("quantityUnit")));
                 }
 
                 recipe.setIngredients(ingredients);
@@ -222,7 +269,7 @@ public class RecipeDaoImpl implements RecipeDao {
 
     private boolean checkCuisine(Recipe recipe, String cuisine) {
         boolean isValid = true;
-        if (cuisine != null && !recipe.getCuisine().equals(cuisine)) {
+        if (cuisine != null && !recipe.getCuisine().equalsIgnoreCase(cuisine)) {
             isValid = false;
         }
         return isValid;
@@ -244,12 +291,14 @@ public class RecipeDaoImpl implements RecipeDao {
     public ArrayList<Recipe> getRecipes(SearchCriteria criteria) {
         Connection conn = getConnection();
 
-        ArrayList<String> includedIngredientIDs = new ArrayList<String>();
+        ArrayList<ArrayList<String>> includedIngredientIDs = new ArrayList<ArrayList<String>>();
         ArrayList<String> excludedIngredientIDs = new ArrayList<String>();
 
         for (String ingredient : criteria.getIncludedIngredients()) {
-            includedIngredientIDs.add(getIngredientIDString(conn, ingredient));
+            includedIngredientIDs.add(getIngredientIds(conn, ingredient));
         }
+        
+        System.out.println("Included ingredients: \n" + includedIngredientIDs);
 
         for (String ingredient : criteria.getExcludedIngredients()) {
             excludedIngredientIDs.add(getIngredientIDString(conn, ingredient));
@@ -258,7 +307,8 @@ public class RecipeDaoImpl implements RecipeDao {
         includedIngredientIDs.removeAll(excludedIngredientIDs);
 
         // Get recipes for requested ingredients
-        ArrayList<Recipe> recipes = executeRecipeQuery(conn, includedIngredientIDs);
+        ArrayList<Recipe> recipes = getRecipeIds(conn, includedIngredientIDs);
+                
         // Post process recipe list to remove any with invalid criteria (cuisine, calories, etc.)
         ArrayList<Recipe> validRecipes = postProcessing(recipes, criteria);
 

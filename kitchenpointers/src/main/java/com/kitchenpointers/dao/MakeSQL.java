@@ -52,7 +52,8 @@ public class MakeSQL {
     }
 
     public static String getRecipeDBQuery(ArrayList<String> ingredients) {
-        String sql1 = "SELECT * FROM recipeDB JOIN recipeIngredients on recipeDB.recipeID = recipeIngredients.recipeID WHERE ingredientID in ";
+        String sql1 = "SELECT * FROM recipeDB JOIN recipeIngredients "
+        		+ "ON recipeDB.recipeID = recipeIngredients.recipeID WHERE ingredientID in ";
         String ingredientList = ingredients.toString();
         ingredientList = ingredientList.replace("[", "(").replace("]", ")");
         return sql1 + ingredientList + ";";
