@@ -196,22 +196,38 @@ public class RecipeDaoImpl implements RecipeDao {
         ResultSet rst;
         PreparedStatement pst;
 
-        //TODO: Change this
+        //TODO: Change this to check for recipes containing all ingredients
         ArrayList<String> singleArrayIds = new ArrayList<String>();
         for (ArrayList<String> ids : ingredientIDs) {
         	for (String id : ids)
         		singleArrayIds.add(id);
         }
         
-        String recipeQuery = MakeSQL.getRecipeDBQuery(singleArrayIds);
-        System.out.println("RECIPE QUERY: \n" + recipeQuery);
+        String recipeIDQuery = MakeSQL.getRecipeIDsQuery(singleArrayIds);
+        System.out.println("RECIPE ID QUERY: \n" + recipeIDQuery);
 
+        ArrayList<String> recipeIds = new ArrayList<String>();
         HashMap<Integer, Recipe> recipes = new HashMap<Integer, Recipe>();
         ArrayList<Recipe> recipeList = new ArrayList<Recipe>();
         ArrayList<Ingredient> ingredients;
         float numIDs = ingredientIDs.size();
-
+        String recipeQuery = "";
+        
         try {
+        	
+        	//Get all recipeIDs
+            pst = conn.prepareStatement(recipeIDQuery);
+            rst = pst.executeQuery();
+            
+            while(rst.next()) {
+            	recipeIds.add(rst.getString("recipeID"));
+            }
+            
+            recipeQuery = MakeSQL.getRecipesQuery(recipeIds);
+            
+            System.out.println("Recipe Query: \n" + recipeQuery);
+            
+            //Get all recipes from ids
             pst = conn.prepareStatement(recipeQuery);
             rst = pst.executeQuery();
 

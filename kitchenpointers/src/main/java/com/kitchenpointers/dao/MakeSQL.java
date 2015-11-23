@@ -51,12 +51,30 @@ public class MakeSQL {
         return this.out;
     }
 
-    public static String getRecipeDBQuery(ArrayList<String> ingredients) {
-        String sql1 = "SELECT * FROM recipeDB JOIN recipeIngredients "
+    public static String getRecipeIDsQuery(ArrayList<String> ingredients) {
+      /*  String sql1 = "SELECT * FROM recipeDB JOIN recipeIngredients "
         		+ "ON recipeDB.recipeID = recipeIngredients.recipeID WHERE ingredientID in ";
         String ingredientList = ingredients.toString();
         ingredientList = ingredientList.replace("[", "(").replace("]", ")");
         return sql1 + ingredientList + ";";
+        */
+    	String whereString = " WHERE ingredientID = " + ingredients.get(0) + " ";
+    	
+    	for (int i = 1; i < ingredients.size(); i++) {
+    		whereString += "OR ingredientID = " + ingredients.get(i) + " ";
+    	}
+    	
+        return "SELECT recipeDB.recipeID, COUNT(*) as count FROM recipeDB "
+        		+ "JOIN recipeIngredients on recipeDB.recipeID = recipeIngredients.recipeID"
+        		+ whereString
+        		+ "GROUP BY recipeDB.recipeID "
+        		+ "ORDER BY count DESC;";
+    }
+    
+    public static String getRecipesQuery(ArrayList<String> recipeIds) {
+    	String inString = recipeIds.toString().replace("[", "(").replace("]", ")");
+    	
+    	return "SELECT * FROM recipeDB WHERE recipeID in " + inString + ";";
     }
 
     // Make the query to get the next number for the recipeID for the recipeDB
