@@ -121,15 +121,31 @@ $(document).ready(function(){
 		for(i=1; i<excludedIngredientCounter; i++){
 					excludedIngredients.push($('#excludedIngredientTextbox' + i).val());
 		}
+		
+		var ingredientList = {};
+		
+		if(enteredIngredients.length > 0) {
+			ingredientList.includedIngredients = enteredIngredients;
+		}
+		if(excludedIngredients.length > 0) {
+			ingredientList[excludedIngredients] = excludedIngredients;
+		}
+		if($('#cuisineTextbox').val()) {
+			ingredientList[cuisine] = $('#cuisineTextbox').val();
+		}
+		if($('#calorieTexbox').val()) {
+			ingredientList[calories] = $('#calorieTexbox').val();
+		}
+			
 		  
-		var ingredientList = {
+	/*	var ingredientList = {
 				"includedIngredients" : enteredIngredients,
 				"excludedIngredients" : excludedIngredients,
 				"cuisine" : $('#cuisineTextbox').val(),
 				"calories" : parseInt($('#colorieTexbox').val()),
 				"sortBy" : $('#sortBy option:selected').text()
 			}
-  	     
+  	     */
   	     $.ajax({
   	       url: "/kitchenpointers/getRecipes",
   	       type: 'POST',
@@ -186,7 +202,7 @@ $(document).ready(function(){
 <h1>Online Recipe Matcher</h1>
 	<label>Cuisine : </label><input id='cuisineTextbox' >
 	   
-	<label>Calorie Limit : </label><input id='colorieTexbox' >
+	<label>Calorie Limit : </label><input id='calorieTexbox' >
 	
 	<br><br>
     
