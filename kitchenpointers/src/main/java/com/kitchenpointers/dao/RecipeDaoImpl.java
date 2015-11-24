@@ -56,29 +56,36 @@ public class RecipeDaoImpl implements RecipeDao {
 
         return ingredientID;
     }
-    
-    //Returns all possible ingredient ids in our recipeIngredients table  containing string
+
+    // Returns all possible ingredient ids in our recipeIngredients table
+    // containing string
     private ArrayList<String> getIngredientIds(Connection conn, String ingredient) {
-    	ArrayList<String> ingredientIds = new ArrayList<String>();
-    	ResultSet rst;
+        ArrayList<String> ingredientIds = new ArrayList<String>();
+        ResultSet rst;
         PreparedStatement pst;
 
         if (ingredient.contains("'")) {
             ingredient = ingredient.replace("'", "\\'");
         }
-        
+
         String[] ingredientWords = ingredient.split(" ");
-        
+
+        /*
+         * String query =
+         * "SELECT DISTINCT ingredientID FROM recipeIngredients r " +
+         * "JOIN nutritionFacts n ON r.ingredientID=n.NDB_No " +
+         * "WHERE n.Shrt_Desc LIKE '%" + ingredientWords[0] + "%'";
+         */
         String query = "SELECT DISTINCT ingredientID FROM recipeIngredients r "
-        		+ "JOIN nutritionFacts n ON r.ingredientID=n.NDB_No "
-        		+ "WHERE n.Shrt_Desc LIKE '%" + ingredientWords[0] + "%'";
-        
+                + "JOIN nutritionFacts n ON r.ingredientID=n.NDB_No " + "WHERE n.Shrt_Desc LIKE '%" + ingredientWords[0]
+                + "%'";
+
         for (int i = 1; i < ingredientWords.length; i++) {
-        	query = query + " AND n.Shrt_Desc LIKE '%" + ingredientWords[i] + "%'";
+            query = query + " AND n.Shrt_Desc LIKE '%" + ingredientWords[i] + "%'";
         }
-        
+
         query = query + ";";
-        
+
         System.out.println("Get ingredientIDs query: \n" + query);
 
         try {
@@ -87,14 +94,14 @@ public class RecipeDaoImpl implements RecipeDao {
 
             while (rst.next()) {
                 ingredientIds.add(rst.getString("ingredientID"));
-            } 
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        
+
         System.out.println("Ingredient IDs found: \n" + ingredientIds);
-    	
-    	return ingredientIds;
+
+        return ingredientIds;
     }
 
     @Override
@@ -196,54 +203,48 @@ public class RecipeDaoImpl implements RecipeDao {
         ResultSet rst;
         PreparedStatement pst;
 
-        //TODO: Change this to check for recipes containing all ingredients
+        // TODO: Change this to check for recipes containing all ingredients
         ArrayList<String> singleArrayIds = new ArrayList<String>();
         for (ArrayList<String> ids : ingredientIDs) {
-        	for (String id : ids)
-        		singleArrayIds.add(id);
+            singleArrayIds.addAll(ids);
         }
-        
+
         String recipeIDQuery = MakeSQL.getRecipeIDsQuery(singleArrayIds);
         System.out.println("RECIPE ID QUERY: \n" + recipeIDQuery);
 
-        ArrayList<String> recipeIds = new ArrayList<String>();
+        HashMap<Integer, Integer> recipeIds = new HashMap<Integer, Integer>();
         HashMap<Integer, Recipe> recipes = new HashMap<Integer, Recipe>();
         ArrayList<Recipe> recipeList = new ArrayList<Recipe>();
         ArrayList<Ingredient> ingredients;
         float numIDs = ingredientIDs.size();
         String recipeQuery = "";
-        
+
         try {
-        	
-        	//Get all recipeIDs
+
+            // Get all recipeIDs
             pst = conn.prepareStatement(recipeIDQuery);
             rst = pst.executeQuery();
-            
-            while(rst.next()) {
-            	recipeIds.add(rst.getString("recipeID"));
+
+            while (rst.next()) {
+                recipeIds.put(rst.getInt("recipeID"), rst.getInt("count"));
             }
-            
-            recipeQuery = MakeSQL.getRecipesQuery(recipeIds);
-            
+
+            recipeQuery = MakeSQL.getRecipesQuery(recipeIds.keySet());
+
             System.out.println("Recipe Query: \n" + recipeQuery);
-            
-            //Get all recipes from ids
+
+            // Get all recipes from ids
             pst = conn.prepareStatement(recipeQuery);
             rst = pst.executeQuery();
 
             // Populate Recipe Info
             while (rst.next()) {
                 int currID = rst.getInt("recipeID");
-                if (recipes.containsKey(currID)) {
-                    Recipe currRecipe = recipes.get(currID);
-                    float matchScore = currRecipe.getMatchScore();
-                    currRecipe.setMatchScore(matchScore + (1.0f / numIDs));
-                } else {
-                    Recipe addedRecipe = new Recipe(currID, rst.getString("recipeName"), rst.getInt("calorieCount"),
-                            rst.getInt("fatCount"), rst.getInt("sugarCount"), rst.getInt("proteinCount"),
-                            rst.getString("cuisine"), 0, (1.0f / numIDs), rst.getString("URL"), null);
-                    recipes.put(currID, addedRecipe);
-                }
+                int count = recipeIds.get(currID);
+                Recipe addedRecipe = new Recipe(currID, rst.getString("recipeName"), rst.getInt("calorieCount"),
+                        rst.getInt("fatCount"), rst.getInt("sugarCount"), rst.getInt("proteinCount"),
+                        rst.getString("cuisine"), 0, (new Float(count) / numIDs), rst.getString("URL"), null);
+                recipes.put(currID, addedRecipe);
             }
 
             // Populate Ingredient Info
@@ -260,8 +261,8 @@ public class RecipeDaoImpl implements RecipeDao {
                 rst = pst.executeQuery();
 
                 while (rst.next()) {
-                    ingredients.add(new Ingredient(rst.getInt("ingredientID"), rst.getString("Shrt_Desc"), rst.getDouble("quantityNum"),
-                            rst.getString("quantityUnit")));
+                    ingredients.add(new Ingredient(rst.getInt("ingredientID"), rst.getString("Shrt_Desc"),
+                            rst.getDouble("quantityNum"), rst.getString("quantityUnit")));
                 }
 
                 recipe.setIngredients(ingredients);
@@ -275,6 +276,9 @@ public class RecipeDaoImpl implements RecipeDao {
         return recipeList;
     }
 
+    // Determines whether the provided recipe meets the calorie criteria (is
+    // under or equal to the calorie count)
+    // Returns false if the recipe has more calories than the calorie criteria
     private boolean checkCals(Recipe recipe, int calories) {
         boolean isValid = true;
         if (calories != 0 && recipe.getCalories() > calories) {
@@ -283,6 +287,9 @@ public class RecipeDaoImpl implements RecipeDao {
         return isValid;
     }
 
+    // Determines whether the provided recipe's cuisine matches the cuisine
+    // criteria
+    // Returns false if cuisine does not equal the recipe's cuisine
     private boolean checkCuisine(Recipe recipe, String cuisine) {
         boolean isValid = true;
         if (cuisine != null && !recipe.getCuisine().equalsIgnoreCase(cuisine)) {
@@ -291,12 +298,30 @@ public class RecipeDaoImpl implements RecipeDao {
         return isValid;
     }
 
-    private ArrayList<Recipe> postProcessing(ArrayList<Recipe> recipes, SearchCriteria criteria) {
+    // Determines if any of the ingredients in the recipe are excluded
+    // ingredients
+    // Returns false if the recipes includes excluded ingredients
+    private boolean checkIngredients(Recipe recipe, ArrayList<Integer> ingredientIds) {
+        boolean isValid = true;
+        ArrayList<Ingredient> ingredients = recipe.getIngredients();
+        for (int idx = 0; idx < ingredients.size() && isValid; idx++) {
+            if (ingredientIds.contains(ingredients.get(idx).getIngredientId())) {
+                isValid = false;
+            }
+        }
+        return isValid;
+    }
+
+    // Post processes the list of recipes to remove any that do not meet the
+    // criteria provided
+    private ArrayList<Recipe> postProcessing(ArrayList<Recipe> recipes, SearchCriteria criteria,
+            ArrayList<Integer> excludedIngredients) {
         ArrayList<Recipe> validRecipes = new ArrayList<Recipe>();
         for (Recipe recipe : recipes) {
             int cals = criteria.getCalories();
             String cuisine = criteria.getCuisine();
-            if (checkCals(recipe, cals) && checkCuisine(recipe, cuisine)) {
+            if (checkCals(recipe, cals) && checkCuisine(recipe, cuisine)
+                    && checkIngredients(recipe, excludedIngredients)) {
                 validRecipes.add(recipe);
             }
         }
@@ -308,40 +333,46 @@ public class RecipeDaoImpl implements RecipeDao {
         Connection conn = getConnection();
 
         ArrayList<ArrayList<String>> includedIngredientIDs = new ArrayList<ArrayList<String>>();
-        ArrayList<String> excludedIngredientIDs = new ArrayList<String>();
+        ArrayList<Integer> excludedIngredientIDs = new ArrayList<Integer>();
 
         for (String ingredient : criteria.getIncludedIngredients()) {
             includedIngredientIDs.add(getIngredientIds(conn, ingredient));
         }
-        
+
         System.out.println("Included ingredients: \n" + includedIngredientIDs);
 
+        // Get all excluded ingredient IDs and add them to ArrayList as Integers
+        // for post processing
         for (String ingredient : criteria.getExcludedIngredients()) {
-            excludedIngredientIDs.add(getIngredientIDString(conn, ingredient));
+            ArrayList<String> excludedStrings = getIngredientIds(conn, ingredient);
+            for (String str : excludedStrings) {
+                excludedIngredientIDs.add(new Integer(str));
+            }
         }
 
-        includedIngredientIDs.removeAll(excludedIngredientIDs);
+        System.out.println("Excluded ingredients: \n" + excludedIngredientIDs);
 
         // Get recipes for requested ingredients
         ArrayList<Recipe> recipes = getRecipeIds(conn, includedIngredientIDs);
-                
-        // Post process recipe list to remove any with invalid criteria (cuisine, calories, etc.)
-        ArrayList<Recipe> validRecipes = postProcessing(recipes, criteria);
+
+        // Post process recipe list to remove any with invalid criteria
+        // (excluded ingredients, cuisine, calories, etc.)
+        ArrayList<Recipe> validRecipes = postProcessing(recipes, criteria, excludedIngredientIDs);
 
         return validRecipes;
     }
 
-	@Override
-	public Recipe getRecipeById(int recipeId) {
-		Connection conn = getConnection();
-		
-		ResultSet rst;
+    @Override
+    public Recipe getRecipeById(int recipeId) {
+        Connection conn = getConnection();
+
+        ResultSet rst;
         PreparedStatement pst;
-        
+
         String recipeQuery = "SELECT * FROM recipeDB WHERE recipeID = " + recipeId + ";";
-        
+
         System.out.println("Recipe Query: \n" + recipeQuery);
-        
+
         Recipe recipe = new Recipe();
         ArrayList<Ingredient> ingredients = new ArrayList<Ingredient>();
 
@@ -367,16 +398,16 @@ public class RecipeDaoImpl implements RecipeDao {
             rst = pst.executeQuery();
 
             while (rst.next()) {
-                ingredients.add(new Ingredient(rst.getInt("ingredientID"), rst.getString("Shrt_Desc"), rst.getDouble("quantityNum"),
-                        rst.getString("quantityUnit")));
+                ingredients.add(new Ingredient(rst.getInt("ingredientID"), rst.getString("Shrt_Desc"),
+                        rst.getDouble("quantityNum"), rst.getString("quantityUnit")));
             }
 
-            recipe.setIngredients(ingredients);            
+            recipe.setIngredients(ingredients);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        
+
         return recipe;
-	}
+    }
 
 }
