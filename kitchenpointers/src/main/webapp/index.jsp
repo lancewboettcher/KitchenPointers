@@ -147,7 +147,7 @@ $(document).ready(function(){
 			}
   	     */
   	     $.ajax({
-  	       url: "/kitchenpointers/getRecipes",
+  	       url: "/getRecipes",
   	       type: 'POST',
   	       contentType:'application/json',
   	       data: JSON.stringify(ingredientList),
