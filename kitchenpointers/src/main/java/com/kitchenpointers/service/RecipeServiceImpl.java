@@ -36,6 +36,13 @@ public class RecipeServiceImpl implements RecipeService {
 		
 		recipeDao.deleteRecipe(recipeId);
 	}
+
+	@Override
+	public Recipe getRecipeById(int recipeId) {
+		RecipeDao recipeDao = new RecipeDaoImpl();
+		
+		return recipeDao.getRecipeById(recipeId);
+	}
 }
 
 /* 

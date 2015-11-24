@@ -12,5 +12,7 @@ public interface RecipeDao {
 	void addRecipe(Recipe recipe);
 
 	public void deleteRecipe(int recipeId);
+
+	public Recipe getRecipeById(int recipeId);
 	
 }

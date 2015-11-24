@@ -331,4 +331,52 @@ public class RecipeDaoImpl implements RecipeDao {
         return validRecipes;
     }
 
+	@Override
+	public Recipe getRecipeById(int recipeId) {
+		Connection conn = getConnection();
+		
+		ResultSet rst;
+        PreparedStatement pst;
+        
+        String recipeQuery = "SELECT * FROM recipeDB WHERE recipeID = " + recipeId + ";";
+        
+        System.out.println("Recipe Query: \n" + recipeQuery);
+        
+        Recipe recipe = new Recipe();
+        ArrayList<Ingredient> ingredients = new ArrayList<Ingredient>();
+
+        try {
+            pst = conn.prepareStatement(recipeQuery);
+            rst = pst.executeQuery();
+
+            // Populate Recipe Info
+            if (rst.next()) {
+                recipe = new Recipe(recipeId, rst.getString("recipeName"), rst.getInt("calorieCount"),
+                        rst.getInt("fatCount"), rst.getInt("sugarCount"), rst.getInt("proteinCount"),
+                        rst.getString("cuisine"), 0, 0, rst.getString("URL"), null);
+            }
+
+            // Populate Ingredient Info
+            String query = "SELECT r.recipeID, r.ingredientID, r.quantityNum, r.quantityUnit, n.Shrt_Desc "
+                    + "FROM recipeIngredients r " + "JOIN nutritionFacts n " + "ON r.ingredientID=n.NDB_No "
+                    + "WHERE recipeID =" + recipe.getId() + ";";
+
+            System.out.println("Get ings q: \n" + query);
+
+            pst = conn.prepareStatement(query);
+            rst = pst.executeQuery();
+
+            while (rst.next()) {
+                ingredients.add(new Ingredient(rst.getInt("ingredientID"), rst.getString("Shrt_Desc"), rst.getDouble("quantityNum"),
+                        rst.getString("quantityUnit")));
+            }
+
+            recipe.setIngredients(ingredients);            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        
+        return recipe;
+	}
+
 }

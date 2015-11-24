@@ -2,6 +2,7 @@ package com.kitchenpointers.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,6 +28,13 @@ public class RecipeController {
         return "hellosasd";
     }
 
+    @RequestMapping(value = "/getRecipeById/{recipeId}", method = RequestMethod.GET)
+    public Recipe getRecipeById(@PathVariable int recipeId) {
+        System.out.println("Called get Recipe By ID: " + recipeId);
+
+        return recipeService.getRecipeById(recipeId);
+    }
+    
     @RequestMapping(value = "/getRecipes", method = RequestMethod.POST)
     public GetRecipesResponse getRecipes(@RequestBody SearchCriteria criteria) {
         System.out.println("Called get Recipes!");
