@@ -9,10 +9,12 @@ public interface RecipeService {
 	
 	public ArrayList<Recipe> getRecipes(SearchCriteria criteria);
 
-	public void addRecipe(Recipe recipe);
+	public Integer addRecipe(Recipe recipe);
 
 	void deleteRecipe(int recipeId);
 
 	public Recipe getRecipeById(int recipeId);
+
+	public String checkAddRecipeArguments(Recipe recipe);
 
 }
