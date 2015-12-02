@@ -131,10 +131,10 @@ $(document).ready(function(){
 			ingredientList[excludedIngredients] = excludedIngredients;
 		}
 		if($('#cuisineTextbox').val()) {
-			ingredientList[cuisine] = $('#cuisineTextbox').val();
+			ingredientList["cuisine"] = $('#cuisineTextbox').val();
 		}
 		if($('#calorieTexbox').val()) {
-			ingredientList[calories] = $('#calorieTexbox').val();
+			ingredientList["calories"] = $('#calorieTexbox').val();
 		}
 			
 		  
