@@ -103,6 +103,49 @@ public class RecipeDaoImpl implements RecipeDao {
 
         return ingredientIds;
     }
+    
+    public ArrayList<String> getFoodTypeOntologicalRelationship(Connection conn, String ingredient) {
+    	ArrayList<String> foodGroupIds = new ArrayList<String>();
+        ResultSet rst;
+        PreparedStatement pst;
+
+        if (ingredient.contains("'")) {
+            ingredient = ingredient.replace("'", "\\'");
+        }
+
+        String[] ingredientWords = ingredient.split(" ");
+        
+        String query = "SELECT nutritionFacts.NDB_No, nutritionFacts.Shrt_Desc, "
+    			+ "foodGroups.FdGrp_Cd, foodGroups.FdGrp_Desc "
+    			+ "FROM nutritionFacts JOIN foodTypeOntologicalRelationships ON "
+    			+ "nutritionFacts.NDB_No = foodTypeOntologicalRelationships.NDB_No "
+    			+ "JOIN foodGroups ON foodGroups.FdGrp_Cd = foodTypeOntologicalRelationships.FdGrp_Cd "
+    			+ "WHERE nutritionFacts.Shrt_Desc LIKE '%" + ingredientWords[0]
+    	        + "%'";
+        
+        for (int i = 1; i < ingredientWords.length; i++) {
+            query = query + " AND n.Shrt_Desc LIKE '%" + ingredientWords[i] + "%'";
+        }
+        
+        query = query + " GROUP BY foodGroups.FdGrp_Cd";
+        
+        System.out.println("Get ingredientIDs query: \n" + query);
+
+        try {
+            pst = conn.prepareStatement(query);
+            rst = pst.executeQuery();
+
+            while (rst.next()) {
+                foodGroupIds.add(rst.getString("FdGrp_Cd"));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        System.out.println("Food Groups found: \n" + foodGroupIds);
+
+        return foodGroupIds;
+    }
 
     @Override
     public void addRecipe(Recipe recipe) {
