@@ -25,7 +25,7 @@ public class RecipeDaoImpl implements RecipeDao {
 
         return conn;
     }
-
+    
     private String getIngredientIDString(Connection conn, String ingredient) {
         ResultSet rst;
         PreparedStatement pst;
@@ -148,11 +148,22 @@ public class RecipeDaoImpl implements RecipeDao {
     }
 
     @Override
-    public void addRecipe(Recipe recipe) {
+    public int addRecipe(Recipe recipe) {
         Connection conn = getConnection();
         PreparedStatement pst;
+        ResultSet rst;
+        
+        recipe.setId(null); //Don't want to accidentally delete an existing recipe
 
         try {
+        	//Get the next recipeID
+			pst = conn.prepareStatement("SELECT MAX(recipeID) from recipeDB;");
+			rst = pst.executeQuery();
+			
+			if (rst.next()) {
+				recipe.setId(rst.getInt("MAX(recipeID)") + 1);
+			}
+        	
             // Create the Recipe
             pst = conn.prepareStatement("INSERT into recipeDB values(?, ?, ?, NULL, NULL, NULL, NULL,?);");
             pst.setInt(1, recipe.getId());
@@ -164,10 +175,11 @@ public class RecipeDaoImpl implements RecipeDao {
 
             // Add all ingredients
             for (Ingredient ingredient : recipe.getIngredients()) {
-                pst = conn.prepareStatement("INSERT into recipeIngredients values(?,?,?);");
+                pst = conn.prepareStatement("INSERT into recipeIngredients values(?,?,?,?);");
                 pst.setInt(1, recipe.getId());
                 pst.setString(2, getIngredientIDString(conn, ingredient.getName()));
-                pst.setString(3, Double.toString(ingredient.getQuantity()));
+                pst.setDouble(3, ingredient.getQuantity());
+                pst.setString(4, ingredient.getUnit());
 
                 pst.executeUpdate();
             }
@@ -215,6 +227,8 @@ public class RecipeDaoImpl implements RecipeDao {
 
             ex.printStackTrace();
         }
+        
+        return recipe.getId();
     }
 
     @Override
@@ -376,12 +390,22 @@ public class RecipeDaoImpl implements RecipeDao {
         Connection conn = getConnection();
 
         ArrayList<ArrayList<String>> includedIngredientIDs = new ArrayList<ArrayList<String>>();
+        ArrayList<String> ingredientIds;
         ArrayList<Integer> excludedIngredientIDs = new ArrayList<Integer>();
 
         for (String ingredient : criteria.getIncludedIngredients()) {
-            includedIngredientIDs.add(getIngredientIds(conn, ingredient));
+        	//Get all ingredient IDs in our DB matching that string
+        	ingredientIds = getIngredientIds(conn, ingredient);
+        	
+        	if (!ingredientIds.isEmpty())
+        		includedIngredientIDs.add(ingredientIds);
         }
-
+        
+        if (includedIngredientIDs.isEmpty()) {
+        	//No matching included ingredients in our database
+        	return null;
+        }
+        
         System.out.println("Included ingredients: \n" + includedIngredientIDs);
 
         // Get all excluded ingredient IDs and add them to ArrayList as Integers
@@ -428,6 +452,8 @@ public class RecipeDaoImpl implements RecipeDao {
                 recipe = new Recipe(recipeId, rst.getString("recipeName"), rst.getInt("calorieCount"),
                         rst.getInt("fatCount"), rst.getInt("sugarCount"), rst.getInt("proteinCount"),
                         rst.getString("cuisine"), 0, 0, rst.getString("URL"), null);
+            } else {
+            	return null;
             }
 
             // Populate Ingredient Info

@@ -9,7 +9,7 @@ public interface RecipeDao {
 
 	public ArrayList<Recipe> getRecipes(SearchCriteria criteria);
 
-	void addRecipe(Recipe recipe);
+	int addRecipe(Recipe recipe);
 
 	public void deleteRecipe(int recipeId);
 

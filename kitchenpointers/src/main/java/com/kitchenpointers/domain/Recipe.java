@@ -3,14 +3,14 @@ package com.kitchenpointers.domain;
 import java.util.ArrayList;
 
 public class Recipe {
-    private int id;
+    private Integer id;
     private String name;
-    private int calories;
-    private int fat;
-    private int sugar;
-    private int protein;
+    private Integer calories;
+    private Integer fat;
+    private Integer sugar;
+    private Integer protein;
     private String cuisine;
-    private int rating;
+    private Integer rating;
     private float matchScore;
     private String url;
     ArrayList<Ingredient> ingredients;
@@ -29,7 +29,7 @@ public class Recipe {
         ingredients = new ArrayList<Ingredient>();
     }
 
-    public Recipe(int id, String name, int calories, int fat, int sugar, int protein, String cuisine, int rating, float matchScore,
+    public Recipe(Integer id, String name, Integer calories, Integer fat, Integer sugar, Integer protein, String cuisine, Integer rating, float matchScore,
             String url, ArrayList<Ingredient> ingredients) {
         super();
         this.id = id;
@@ -45,11 +45,11 @@ public class Recipe {
         this.ingredients = ingredients;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -61,35 +61,35 @@ public class Recipe {
         this.name = name;
     }
 
-    public int getCalories() {
+    public Integer getCalories() {
         return calories;
     }
 
-    public void setCalories(int calories) {
+    public void setCalories(Integer calories) {
         this.calories = calories;
     }
 
-    public int getFat() {
+    public Integer getFat() {
         return fat;
     }
 
-    public void setFat(int fat) {
+    public void setFat(Integer fat) {
         this.fat = fat;
     }
 
-    public int getSugar() {
+    public Integer getSugar() {
         return sugar;
     }
 
-    public void setSugar(int sugar) {
+    public void setSugar(Integer sugar) {
         this.sugar = sugar;
     }
 
-    public int getProtein() {
+    public Integer getProtein() {
         return protein;
     }
 
-    public void setProtein(int protein) {
+    public void setProtein(Integer protein) {
         this.protein = protein;
     }
 
@@ -101,11 +101,11 @@ public class Recipe {
         this.cuisine = cuisine;
     }
 
-    public int getRating() {
+    public Integer getRating() {
         return rating;
     }
 
-    public void setRating(int rating) {
+    public void setRating(Integer rating) {
         this.rating = rating;
     }
 
