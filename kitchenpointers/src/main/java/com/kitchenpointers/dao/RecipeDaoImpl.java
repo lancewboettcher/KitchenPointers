@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -228,6 +229,12 @@ public class RecipeDaoImpl implements RecipeDao {
             ex.printStackTrace();
         }
         
+        try {
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+        
         return recipe.getId();
     }
 
@@ -254,6 +261,12 @@ public class RecipeDaoImpl implements RecipeDao {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        
+        try {
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
     }
 
     private ArrayList<Recipe> getRecipeIds(Connection conn, ArrayList<ArrayList<String>> ingredientIDs) {
@@ -426,6 +439,12 @@ public class RecipeDaoImpl implements RecipeDao {
         // (excluded ingredients, cuisine, calories, etc.)
         ArrayList<Recipe> validRecipes = postProcessing(recipes, criteria, excludedIngredientIDs);
 
+        try {
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+        
         return validRecipes;
     }
 
@@ -474,7 +493,13 @@ public class RecipeDaoImpl implements RecipeDao {
             recipe.setIngredients(ingredients);
         } catch (Exception ex) {
             ex.printStackTrace();
-        }
+        } 
+        
+        try {
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
         return recipe;
     }
